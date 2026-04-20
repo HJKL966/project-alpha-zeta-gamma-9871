@@ -45,15 +45,11 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     waiting_msg = await context.bot.send_message(chat_id=chat_id, text=f"⏳ جاري البحث عن {username}...")
     
     try:
-        # --- الجزء الخاص بـ ScraperAPI ---
+        # --- الجزء الخاص بـ ScraperAPI (النسخة المصححة) ---
         tiktok_url = f"https://www.tiktok.com/@{username}"
         
-        # إعداد الطلب الذي سنرسله إلى ScraperAPI
-        scraper_payload = {
-            'api_key': SCRAPER_API_KEY,
-            'url': tiktok_url,
-            'keep_headers': 'true' # مهم لتمرير الكوكيز الخاصة بنا
-        }
+        # بناء رابط ScraperAPI الصحيح الذي يحتوي على كل المعلومات
+        scraper_url = f"http://api.scraperapi.com?api_key={SCRAPER_API_KEY}&url={tiktok_url}"
         
         # إعداد الهيدرز التي سيمررها ScraperAPI إلى تيك توك
         headers = {
@@ -63,10 +59,9 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         logger.info(f"ScraperAPI يزور الرابط: {tiktok_url}")
         
-        # إرسال الطلب إلى خادم ScraperAPI
-        response = requests.post(
-            'http://api.scraperapi.com',
-            json=scraper_payload,
+        # إرسال الطلب إلى خادم ScraperAPI باستخدام GET
+        response = requests.get(
+            scraper_url,
             headers=headers,
             timeout=60 # نعطي الخدمة وقتًا كافيًا (60 ثانية)
         )
